@@ -25,6 +25,12 @@ module CapistranoUnicorn
           end
         end
 
+        def unicorn_get_old_pid
+           if remote_file_exists?(unicorn_old_pid) && remote_process_exists?(unicorn_old_pid)
+             capture("cat #{unicorn_old_pid}")
+           end
+         end
+
         # Send a signal to unicorn master process
         #
         def unicorn_send_signal(pid, signal)
@@ -37,6 +43,7 @@ module CapistranoUnicorn
                  'unicorn:restart', 'unicorn:reload', 'unicorn:add_worker',  
                  'unicorn:remove_worker' ] do
           _cset(:unicorn_pid, "#{fetch(:current_path)}/tmp/pids/unicorn.pid")
+          _cset(:unicorn_old_pid, "#{fetch(:current_path)}/tmp/pids/unicorn.pid.oldbin")          
           _cset(:app_env, (fetch(:rails_env) rescue 'production'))
           _cset(:unicorn_env, (fetch(:app_env)))
           _cset(:unicorn_bin, "unicorn")
